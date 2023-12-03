@@ -2,7 +2,6 @@ package xyz.rowaaaaan.aoc;
 
 import java.io.File;
 import java.util.Scanner;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,31 +33,113 @@ public class Main {
 
             while (input.hasNext()) {
                 String line = input.nextLine();
+                int tens = 0;
+                int ones = 0;
                 LOGGER.info(() -> "Current line: " + line);
 
-                // Get tens digit
+                // Get tens digit.
+                // If the character is an integer, break.
+                // Otherwise, check if the character is a starting
+                // letter for any of the numbers.
+                // If so, then parse the substring if it is a number.
                 for (int i = 0; i < line.length(); i++) {
                     if (isDigit(line.charAt(i))) {
                         LOGGER.log(Level.INFO, "Found tens digit: {0}", line.charAt(i));
-                        calibrationSum += Character.getNumericValue(line.charAt(i)) * 10;
+                        tens = Character.getNumericValue(line.charAt(i));
                         break;
+                    } else {
+                        tens = parseStringNum(line.substring(i));
+                        if (tens != 0) {
+                            break;
+                        }
                     }
                 }
 
                 // Get ones digit
                 for (int j = line.length() - 1; j >= 0; j--) {
                     if (isDigit(line.charAt(j))) {
-                        LOGGER.log(Level.INFO, "Found ones digit: {0}", line.charAt(j));
-                        calibrationSum += Character.getNumericValue(line.charAt(j));
+                        ones = Character.getNumericValue(line.charAt(j));
+                        LOGGER.log(Level.INFO, "Found ones digit: {0}", ones);
                         break;
+                    } else {
+                        ones = parseStringNum(line.substring(j));
+                        if (ones != 0) {
+                            LOGGER.log(Level.INFO, "Found ones digit: {0}", ones);
+                            break;
+                        }
                     }
                 }
+                calibrationSum += (tens * 10) + ones;
             }
         } catch (Exception e) {
-            e.getMessage();
+            LOGGER.log(Level.SEVERE, "Exception caught: {0}", e.getMessage());
         }
 
         LOGGER.log(Level.INFO, "Calibration sum: {0}", calibrationSum);
+    }
+
+    private static int parseStringNum(String str) {
+        LOGGER.log(Level.INFO, "Parsing substring {0}", str);
+        int num = 0;
+        switch (str.charAt(0)) {
+            case 'o': {
+                if (str.length() < 3) {
+                    num = 0;
+                } else if (str.substring(0, 3).equals("one")) {
+                    num = 1;
+                }
+                break;
+            }
+            case 't': {
+                if ((str.length() >= 3) && str.substring(0, 3).equals("two")) {
+                    num = 2;
+                } else if ((str.length() >= 5) && str.substring(0, 5).equals("three")) {
+                    num = 3;
+                }
+                break;
+            }
+            case 'f': {
+                if (str.length() < 4) {
+                    num = 0;
+                } else if (str.substring(0, 4).equals("four")) {
+                    num = 4;
+                } else if (str.substring(0, 4).equals("five")) {
+                    num = 5;
+                }
+                break;
+            }
+            case 's': {
+                if ((str.length() >= 3) && str.substring(0, 3).equals("six")) {
+                    num = 6;
+                } else if ((str.length() >= 5) && str.substring(0, 5).equals("seven")) {
+                    num = 7;
+                }
+                break;
+            }
+            case 'e': {
+                if (str.length() < 5) {
+                    num = 0;
+                } else if (str.substring(0, 5).equals("eight")) {
+                    num = 8;
+                }
+                break;
+            }
+            case 'n': {
+                if (str.length() < 4) {
+                    num = 0;
+                } else if (str.substring(0, 4).equals("nine")) {
+                    num = 9;
+                }
+                break;
+            }
+            default:
+                num = 0;
+                break;
+        }
+        if (num != 0) {
+            LOGGER.log(Level.INFO, "Detected number: {0}", num);
+        }
+        return num;
     }
 
     private static boolean isDigit(char c) {
